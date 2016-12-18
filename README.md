@@ -56,9 +56,9 @@ php artisan key:generate
 * ```PROXMOX_USER=root```
   * A user that has full privledges to your Proxmox nodes
 * ```PROXMOX_PASS=123456```
-  * <--- Password for that use
+  * Password for that user
 * ```PROXMOX_REALM=pve```                       
-  * <--- What proxmox realm that user is in
+  * What proxmox realm that user is in
 
 6. Start a local web server
 
