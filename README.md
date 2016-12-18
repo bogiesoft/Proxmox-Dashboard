@@ -8,6 +8,8 @@ A Laravel Application that manages our Proxmox Cluster. Features include cluster
 * Provision new QEMU vms
 * Monitor all tasks on the cluster
 
+## Provisioning
+The provsioning feature is just a simple script that takes a template in your cluster and deploys a new FULL CLONE of it to the storage you have specified.
 
 ## Failure domains
 By default this software assumes that each PVE cluster node is a seperate failure domain.
