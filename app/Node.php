@@ -130,15 +130,24 @@ class Node extends Model
         $storage = \Proxmox::get('/storage');
 
         $ret = [];
-
         foreach($storage['data'] as $d)
         {
-            if($d['storage'] != 'local' && stristr('images', $d['content']))
+            if(stristr($d['content'], 'images'))
             {
-                $ret[$d['storage']] = $d['storage'];
+                $showLocal = env('PROXMOX_SHOW_LOCAL_STORAGE') ?: true;
+
+                if($showLocal === true)
+                {
+                    $ret[$d['storage']] = $d['storage'];
+                } else {
+                    if($d['storage'] != 'local')
+                    {
+                        $ret[$d['storage']] = $d['storage'];
+                    }
+                }
+
             }
         }
-
         asort($ret);
 
         return $ret;
