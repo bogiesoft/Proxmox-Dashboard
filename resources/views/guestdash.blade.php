@@ -1,4 +1,4 @@
-@extends('layout.main')
+@extends('layout.guest')
 
 @section('content')
 <h1>Dashboard</h1>
@@ -383,15 +383,17 @@
         Recommendations
     </div>
     <div class="panel-body">
+
+
         <div class="row">
             <div class="col-md-6">
                 <h3>Performance recommendations</h3>
+                {!! Form::open(array('route' => 'dorecommendations')) !!}
                 <p id="recommendations">
 
                 </p>
-                {!! Form::open(array('route' => 'dorecommendations')) !!}
                 <input type="hidden" id=recommendationsjson name="recommendations" value="">
-                <button type="submit">Do Recommendations</button>
+
                 {!! Form::close() !!}
             </div>
             <div class="col-md-6">
@@ -402,10 +404,15 @@
 
                 {!! Form::open(array('route' => 'map/dorecommendations')) !!}
                 <input type="hidden" id=maprecommendationsjson name="maprecommendations" value="">
-                <button type="submit">Do Failure Domain Recommendations</button>
+
                 {!! Form::close() !!}
             </div>
         </div>
+
+
+
+
+
     </div>
 </div>
 
