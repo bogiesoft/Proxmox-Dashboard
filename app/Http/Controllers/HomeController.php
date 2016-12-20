@@ -18,6 +18,13 @@ class HomeController extends Controller
         return view('dashboard', compact('nodes', 'recommendations','totalvms', 'status'));
     }
 
+    public function dash(Request $request)
+    {
+
+        return view('guestdash', compact('nodes', 'recommendations','totalvms', 'status'));
+    }
+
+
     public function dashboardData()
     {
 

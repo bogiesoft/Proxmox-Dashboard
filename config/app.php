@@ -168,6 +168,9 @@ return [
          */
         h1g\Proxmox\ProxmoxServiceProvider::class,
         Collective\Html\HtmlServiceProvider::class,
+
+        Barryvdh\Debugbar\ServiceProvider::class,
+
         //
 
         /*

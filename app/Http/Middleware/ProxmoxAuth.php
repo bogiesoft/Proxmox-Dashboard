@@ -1,12 +1,13 @@
 <?php
 
-namespace App;
+namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Auth\Factory as Auth;
+use Illuminate\Http\Request;
 
-class ProxmoxAuthenticate
+class ProxmoxAuth
 {
     /**
      * The authentication factory instance.
@@ -53,14 +54,12 @@ class ProxmoxAuthenticate
      */
     protected function authenticate(array $guards)
     {
-        if (empty($guards)) {
-            return $this->auth->authenticate();
-        }
 
-        foreach ($guards as $guard) {
-            if ($this->auth->guard($guard)->check()) {
-                return $this->auth->shouldUse($guard);
-            }
+        $request = app('request');
+        $loggedin = $request->session()->get('loggedin');
+
+        if ($loggedin) {
+            return true;
         }
 
         throw new AuthenticationException('Unauthenticated.', $guards);

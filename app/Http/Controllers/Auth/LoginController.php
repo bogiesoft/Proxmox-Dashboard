@@ -3,7 +3,13 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Auth\GenericUser;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
+use ProxmoxVE\Exception\AuthenticationException;
+use ProxmoxVE\Proxmox;
 
 class LoginController extends Controller
 {
@@ -35,5 +41,46 @@ class LoginController extends Controller
     public function __construct()
     {
         $this->middleware('guest', ['except' => 'logout']);
+    }
+
+    public function showLoginForm()
+    {
+
+        $domains = \Proxmox::get('access/domains');
+
+        foreach($domains['data'] as $d => $data)
+        {
+            if(empty($data['comment'])) { $data['comment'] = $data['realm']; }
+            $realms[$data['realm']] = $data['comment'];
+        }
+
+
+        return view('auth.login', compact('realms'));
+    }
+
+    public function login(Request $request)
+    {
+
+        $realm = $request->get('realm');
+        $username = $request->get('username');
+        $password = $request->get('password');
+
+        $data = ['hostname' => config('proxmox.server.hostname'), 'username' => $username, 'password' => $password, 'realm' => $realm];
+
+
+        try {
+            $proxmox = new Proxmox($data);
+
+            $request->session()->set('loggedin', True);
+
+            return redirect('/');
+
+        } catch(AuthenticationException $e)
+        {
+
+            return back()->withErrors(['Username, Password or Realm failed']);
+        }
+
+
     }
 }
