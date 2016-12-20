@@ -1,7 +1,10 @@
 @extends('layout.main')
 
 @section('content')
-<h1>Dashboard</h1>
+    <a href="{{ route('dash') }}" target="_BLANK" class="pull-right"><i class="fa fa-link"></i> Shareable Link</a>
+    <h1>Dashboard</h1>
+
+
 
 <div class="panel panel-default">
     <div class="panel-heading">
