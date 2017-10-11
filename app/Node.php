@@ -95,6 +95,46 @@ class Node extends Model
 
     }
 
+    private static function getVMConfig($nodeName, $vmid)
+    {
+        $config = \Proxmox::get('/nodes/'.$nodeName.'/qemu/'.$vmid.'/config');
+        return $config['data'];
+    }
+
+    public static function returnAllVMS()
+    {
+
+        $collection = new Collection();
+
+        $allnodes = \Proxmox::get('/nodes');
+        foreach($allnodes['data'] as $node)
+        {
+
+            $vms = self::getVirtualMachines($node['node']);
+
+            foreach($vms as $vm)
+            {
+                $vm['config'] = (object) self::getVMConfig($node['node'],$vm['vmid']);
+                $collection->push((object) $vm);
+            }
+
+        }
+
+        return $collection;
+    }
+
+    public static function qemuLink($vmid)
+    {
+        //https://cias-pve-blade-1.rit.edu:8006/#v1:0:=qemu%2F115:4::::::
+
+        $nodes = self::getAll();
+
+        $link = 'https://'.$nodes->pop()->name.':8006/#v1:0:=qemu%2F'.$vmid;
+
+        return $link;
+
+    }
+
     private static function getAllVMS()
     {
 
@@ -122,7 +162,6 @@ class Node extends Model
                 self::$data[$node['node']]['vmcount'] = 0;
             }
         }
-
     }
 
     public static function getStorage()
@@ -306,12 +345,14 @@ class Node extends Model
 
         $nodeCount = ["add" => [], "remove" => []];
 
+
         foreach($nodes as $node)
         {
             //Lets determine what action needs to be taken to bring all the nodes to the average vm count
 
-            $diff = $vmcountAverage - $node->vmcount;
 
+
+            $diff = $vmcountAverage - $node->vmcount;
             if($diff < 0)
             {
                 //We need to add vm's
@@ -349,6 +390,22 @@ class Node extends Model
 
                         $recommend[] = "Remove ".$count. " from ".$removeName." to ".$name;
                         $nodeCount["remove"][$removeName] = $nodeCount["remove"][$removeName] - $count;
+                    }
+                }
+            }
+        }
+
+        if(empty($recommend))
+        {
+            foreach($nodeCount['remove'] as $name => $count)
+            {
+                foreach($nodes as $node)
+                {
+                    if($node->name != $name) {
+                        if ($count > 0) {
+                            $recommend[] = "Remove 1 from " . $name . " to " . $node->name;
+                        }
+                        $count--;
                     }
                 }
             }

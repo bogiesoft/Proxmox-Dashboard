@@ -81,6 +81,16 @@ class HomeController extends Controller
         return redirect()->route('tasks');
     }
 
+    public function virtualmachines()
+    {
+        $virtualmachines = Node::returnAllVMS();
+
+        $virtualmachines->sortBy('vmid');
+
+        return view('virtualmachines', compact("virtualmachines"));
+
+    }
+
     public function tasks(Request $request)
     {
 

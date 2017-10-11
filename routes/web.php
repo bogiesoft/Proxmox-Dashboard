@@ -23,6 +23,9 @@ Route::get('provision', ['uses' => 'ProvisionController@create', 'as' => 'provis
 Route::post('provision', ['uses' => 'ProvisionController@store', 'as' => 'doProvision'])->middleware('proxmoxauth');
 Route::get('map', ['uses' => 'MapController@index', 'as' => 'map'])->middleware('proxmoxauth');
 Route::post('map/dorecommendations', ['uses' => 'MapController@doRecommendations', 'as' => 'map/dorecommendations'])->middleware('proxmoxauth');
+
+Route::get('virtualmachines', ['uses' => 'HomeController@virtualmachines', 'as' => 'virtualmachines'])->middleware('proxmoxauth');
+
 Route::get('config', ['uses' => 'HomeController@config', 'as' => 'config'])->middleware('proxmoxauth');
 
 Route::auth();
