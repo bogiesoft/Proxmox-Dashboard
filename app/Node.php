@@ -337,6 +337,8 @@ class Node extends Model
         $totalVMs = 0;
         $recommend = [];
 
+        $nodes = $nodes->sortBy('vmcount');
+
         foreach($nodes as $node)
         {
             $totalVMs += $node->vmcount;
@@ -345,12 +347,9 @@ class Node extends Model
 
         $nodeCount = ["add" => [], "remove" => []];
 
-
         foreach($nodes as $node)
         {
             //Lets determine what action needs to be taken to bring all the nodes to the average vm count
-
-
 
             $diff = $vmcountAverage - $node->vmcount;
             if($diff < 0)
@@ -395,15 +394,19 @@ class Node extends Model
             }
         }
 
+        $allreadyAdded = [];
+
         if(empty($recommend))
         {
             foreach($nodeCount['remove'] as $name => $count)
             {
                 foreach($nodes as $node)
                 {
-                    if($node->name != $name) {
+                    if($node->name != $name &&!isset($allreadyAdded[$node->name])) {
                         if ($count > 0) {
                             $recommend[] = "Remove 1 from " . $name . " to " . $node->name;
+                            $allreadyAdded[$name] = true;
+                            $allreadyAdded[$node->name] = true;
                         }
                         $count--;
                     }
