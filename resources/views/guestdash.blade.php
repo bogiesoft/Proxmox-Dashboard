@@ -73,6 +73,11 @@
 
 
 <style>
+
+    body {
+        padding-top: 5px;
+    }
+
     .chart {
         position: relative;
         display: inline-block;
@@ -353,7 +358,7 @@
         Cluster Nodes
     </div>
     <div class="panel-body">
-        <table class="table table-bordered table-striped">
+        <table class="table table-condensed table-bordered table-striped">
             <thead>
             <tr>
                 <th>Name</th>
@@ -406,11 +411,6 @@
                 {!! Form::close() !!}
             </div>
         </div>
-
-
-
-
-
     </div>
 </div>
 
