@@ -1,8 +1,6 @@
 @extends('layout.guest')
 
 @section('content')
-<h1>Dashboard</h1>
-
 <div class="panel panel-default">
     <div class="panel-heading">
         Cluster Resources
