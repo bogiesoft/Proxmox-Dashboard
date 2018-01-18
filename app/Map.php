@@ -51,7 +51,11 @@ class Map extends Model
                 $domain = $domainIterator;
                 $this->domainLookup[$node->name] = $domain;
             }
-            $this->map[] = ["name" => $node->name, 'vms' => $this->cleanNodeData(Node::getVirtualMachines($node->name)), 'domain' => $domain];
+            if($node->load > '0' && $node->memory > '0') {
+                $this->map[] = ["name" => $node->name, 'vms' => $this->cleanNodeData(Node::getVirtualMachines($node->name)), 'domain' => $domain, 'offline' => false];
+            } else {
+                $this->map[] = ["name" => $node->name, 'vms' => [], 'domain' => $domain, 'offline' => true];
+            }
             $domainIterator++;
         }
 
@@ -133,6 +137,7 @@ class Map extends Model
             $this->current();
         }
 
+
         $this->computeVMGroups();
         //First round is to make sure that all machines in the same groups are in different failure domains
 
@@ -141,15 +146,18 @@ class Map extends Model
             $domains[$nodes['domain']][] = $nodes;
         }
 
+
         foreach($domains as $domain => $nodes)
         {
             $domains[$domain]['groups'] = [];
             foreach($nodes as $node) {
-                foreach ($node['vms'] as $vm) {
-                    foreach ($this->VMgroups as $groupName => $groupValue) {
-                        if (array_search($vm['name'], $groupValue) !== false) {
-                            $domains[$domain]['groups'][$groupName][] = $vm['name'];
-                            $domains[$domain]['nodes'][$node['name']] = $node['name'];
+                if($node['offline'] === false) {
+                    foreach ($node['vms'] as $vm) {
+                        foreach ($this->VMgroups as $groupName => $groupValue) {
+                            if (array_search($vm['name'], $groupValue) !== false) {
+                                $domains[$domain]['groups'][$groupName][] = $vm['name'];
+                                $domains[$domain]['nodes'][$node['name']] = $node['name'];
+                            }
                         }
                     }
                 }
@@ -225,22 +233,20 @@ class Map extends Model
 
         $possibleNodes = [];
         foreach($this->map as $nodes){
-            if($nodes['domain'] != $existingDomain)
+            if($nodes['domain'] != $existingDomain && $nodes['offline'] === false)
             {
                 if(!isset($nodes['groups'][$group]) || $nodes['groups'][$group] < $max) {
-                    $possibleNodes[] = $nodes;
-
+                        $possibleNodes[] = $nodes;
                 }
             }
         }
-
 
         if(count($possibleNodes) > 1)
         {
             //Ok there are two options, pick the one with least number of VM's currently
             foreach($possibleNodes as $node)
             {
-                $nodeCount[$node['name']] = count($node['vms']);
+                    $nodeCount[$node['name']] = count($node['vms']);
             }
         }
 

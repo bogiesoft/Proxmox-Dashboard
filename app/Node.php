@@ -339,7 +339,13 @@ class Node extends Model
 
         $nodes = $nodes->sortBy('vmcount');
 
-        foreach($nodes as $node)
+        foreach($nodes as $key => $node) {
+            if ($node->memory == 0 && $node->load == 0) {
+                unset($nodes[$key]);
+            }
+        }
+
+        foreach($nodes as $key => $node)
         {
             $totalVMs += $node->vmcount;
         }
