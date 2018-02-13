@@ -368,6 +368,7 @@ class Node extends Model
             }
         }
 
+        $allreadyRemoved = [];
 
         //We known which machines need more machines and which need less machines;
         //Lets recommend which machines to add from the VMs from
@@ -378,7 +379,10 @@ class Node extends Model
             if($key !== false)
             {
                 //We have an exact match
-                $recommend[] = "Remove ".$count." from ".$key. " to ".$name;
+                if(!isset($allreadyRemoved[$key])) {
+                    $recommend[] = "Remove " . $count . " from " . $key . " to " . $name;
+                    $allreadyRemoved[$key] = true;
+                }
             } else {
                 //No one has an exact match
 
@@ -387,14 +391,18 @@ class Node extends Model
 
                     if($removeCount < $count && $removeCount != 0)
                     {
-
-                        $recommend[] = "Remove ".$removeCount." from ".$removeName." to ".$name;
-                        //Update the node counts
-                        $nodeCount["remove"][$removeName] = $nodeCount["remove"][$removeName] - $removeCount;
+                        if(!isset($allreadyRemoved[$removeName])) {
+                            $recommend[] = "Remove " . $removeCount . " from " . $removeName . " to " . $name;
+                            //Update the node counts
+                            $nodeCount["remove"][$removeName] = $nodeCount["remove"][$removeName] - $removeCount;
+                            $allreadyRemoved[$removeName] = true;
+                        }
                     } else {
-
-                        $recommend[] = "Remove ".$count. " from ".$removeName." to ".$name;
-                        $nodeCount["remove"][$removeName] = $nodeCount["remove"][$removeName] - $count;
+                        if(!isset($allreadyRemoved[$removeName])) {
+                            $recommend[] = "Remove " . $count . " from " . $removeName . " to " . $name;
+                            $nodeCount["remove"][$removeName] = $nodeCount["remove"][$removeName] - $count;
+                            $allreadyRemoved[$removeName] = true;
+                        }
                     }
                 }
             }
@@ -402,15 +410,17 @@ class Node extends Model
 
         $allreadyAdded = [];
 
+
         if(empty($recommend))
         {
             foreach($nodeCount['remove'] as $name => $count)
             {
                 foreach($nodes as $node)
                 {
-                    if($node->name != $name &&!isset($allreadyAdded[$node->name])) {
+                    if($node->name != $name && !isset($allreadyAdded[$node->name])) {
                         if ($count > 0) {
                             $recommend[] = "Remove 1 from " . $name . " to " . $node->name;
+                            $allreadyRemoved[$name] = true;
                             $allreadyAdded[$name] = true;
                             $allreadyAdded[$node->name] = true;
                         }
@@ -419,6 +429,7 @@ class Node extends Model
                 }
             }
         }
+
 
         return $recommend;
     }
